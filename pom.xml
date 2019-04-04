@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>io.zeebe</groupId>
+	<artifactId>voyager</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+
+	<properties>
+		<kotlin.version>1.3.21</kotlin.version>
+		<zeebe.version>0.17.0</zeebe.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.zeebe</groupId>
+			<artifactId>zeebe-bpmn-model</artifactId>
+			<version>${zeebe.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
