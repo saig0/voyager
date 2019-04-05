@@ -1,10 +1,13 @@
 package io.zeebe.voyager.transformer
 
-import io.zeebe.voyager.model.Workflow
 import io.zeebe.model.bpmn.BpmnModelInstance
 import io.zeebe.model.bpmn.instance.Process as BpmnProcess
 import io.zeebe.model.bpmn.instance.StartEvent as BpmnStartEvent
-import io.zeebe.voyager.model.StartEvent
+import io.zeebe.model.bpmn.instance.ServiceTask as BpmnServiceTask
+import io.zeebe.model.bpmn.instance.EndEvent as BpmnEndEvent
+import io.zeebe.model.bpmn.instance.FlowNode as BpmnFlowNode
+import io.zeebe.model.bpmn.instance.SequenceFlow as BpmnSequenceFlow
+import io.zeebe.voyager.model.*
 
 object WorkflowTransformer {
 
@@ -14,16 +17,36 @@ object WorkflowTransformer {
 		val workflows = processes.map { process ->
 			val bpmnProcessId = process.getId()
 
-			val startEvents = process.getChildElementsByType(BpmnStartEvent::class.java)
+			val flowNodes = process.getChildElementsByType(BpmnFlowNode::class.java).map { flowNode ->
+				when (flowNode) {
+					is BpmnStartEvent -> StartEvent(id = flowNode.id)
+					is BpmnServiceTask -> Task(id = flowNode.id, type = "???")
+					is BpmnEndEvent -> EndEvent(id = flowNode.id)
+					else -> FlowNode(id = flowNode.id)
+				}
+			}
 
-			val startEvent = startEvents.toList().get(0)
+			val flowNodesById = flowNodes.associateBy { it.id }
+
+			process.getChildElementsByType(BpmnSequenceFlow::class.java).map { sequenceFlow ->
+				val source = flowNodesById.get(sequenceFlow.source.id)!!
+				val target = flowNodesById.get(sequenceFlow.target.id)!!
+
+				val flow = SequenceFlow(
+					id = sequenceFlow.id,
+					source = source,
+					target = target
+				)
+
+				source.outcomming.add(flow)
+				target.incomming.add(flow)
+			}
+
+			val startEvent = flowNodes.filterIsInstance(StartEvent::class.java).toList().first()
 
 			Workflow(
 				bpmnProcessId = bpmnProcessId,
-				startEvent = StartEvent(
-					id = startEvent.getId(),
-					outcomming = emptyList()
-				)
+				startEvent = startEvent
 			)
 		}
 

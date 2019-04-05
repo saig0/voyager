@@ -5,34 +5,29 @@ class Workflow(
 	val startEvent: StartEvent
 )
 
-open class FlowNode(
-	val id: String,
-	val incomming: List<SequenceFlow>,
-	val outcomming: List<SequenceFlow>
+open class FlowElement(
+	val id: String
 )
+
+open class FlowNode(id: String) : FlowElement(id = id) {
+
+	var outcomming = mutableListOf<SequenceFlow>()
+	var incomming = mutableListOf<SequenceFlow>()
+}
 
 class SequenceFlow(
-	val id: String,
+	id: String,
 	val source: FlowNode,
 	val target: FlowNode
-)
+) : FlowElement(id = id)
 
-class StartEvent(
-	id: String,
-	outcomming: List<SequenceFlow>
-) : FlowNode(
-	id = id,
-	incomming = emptyList(),
-	outcomming = outcomming
-)
+class StartEvent(id: String) : FlowNode(id = id)
+
+class EndEvent(id: String) : FlowNode(id = id)
+
 
 class Task(
 	id: String,
-	incomming: List<SequenceFlow>,
-	outcomming: List<SequenceFlow>
-) : FlowNode(
-	id = id,
-	incomming = incomming,
-	outcomming = outcomming
-)
+	val type: String
+) : FlowNode(id = id)
 				
