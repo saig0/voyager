@@ -8,6 +8,7 @@ import io.zeebe.model.bpmn.instance.EndEvent as BpmnEndEvent
 import io.zeebe.model.bpmn.instance.FlowNode as BpmnFlowNode
 import io.zeebe.model.bpmn.instance.SequenceFlow as BpmnSequenceFlow
 import io.zeebe.voyager.model.*
+import io.zeebe.model.bpmn.instance.zeebe.ZeebeTaskDefinition
 
 object WorkflowTransformer {
 
@@ -20,7 +21,10 @@ object WorkflowTransformer {
 			val flowNodes = process.getChildElementsByType(BpmnFlowNode::class.java).map { flowNode ->
 				when (flowNode) {
 					is BpmnStartEvent -> StartEvent(id = flowNode.id)
-					is BpmnServiceTask -> Task(id = flowNode.id, type = "???")
+					is BpmnServiceTask -> Task(
+						id = flowNode.id,
+						type = flowNode.getSingleExtensionElement(ZeebeTaskDefinition::class.java).getType()
+					)
 					is BpmnEndEvent -> EndEvent(id = flowNode.id)
 					else -> FlowNode(id = flowNode.id)
 				}
