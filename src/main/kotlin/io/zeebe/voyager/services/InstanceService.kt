@@ -1,11 +1,11 @@
 package io.zeebe.voyager.services
 
-import io.zeebe.voyager.model.FlowNode
-import io.zeebe.voyager.model.WorkflowInstance
 import io.zeebe.voyager.model.Workflow
+import io.zeebe.voyager.execution.WorkflowInstance
 
 interface InstanceService {
     fun newInstance(workflow: Workflow) : WorkflowInstance
-    fun updateInstance(key: Long, state: FlowNode)
+    fun updateInstance(instance: WorkflowInstance)
+    fun removeInstance(instance: WorkflowInstance)
     fun getInstance(key: Long) : WorkflowInstance?
 }

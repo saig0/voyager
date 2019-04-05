@@ -7,7 +7,7 @@ import io.zeebe.voyager.execution.WorkflowExecutor
 
 class WorkflowEngine(val configuration: Configuration) {
 
-	val executor = WorkflowExecutor(configuration)
+	private val executor = WorkflowExecutor(configuration)
 
 	fun deploy(stream: InputStream) {
 

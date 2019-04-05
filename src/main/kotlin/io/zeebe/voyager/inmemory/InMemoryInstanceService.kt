@@ -1,26 +1,28 @@
 package io.zeebe.voyager.inmemory
 
-import io.zeebe.voyager.model.FlowNode
 import io.zeebe.voyager.model.Workflow
-import io.zeebe.voyager.model.WorkflowInstance
+import io.zeebe.voyager.execution.WorkflowInstance
 import io.zeebe.voyager.services.InstanceService
 
 class InMemoryInstanceService : InstanceService
 {
-    val instances: MutableList<WorkflowInstance> = mutableListOf()
+    private val instances: MutableMap<Long, WorkflowInstance> = mutableMapOf()
+    private var keyGenerator : Long = 0
 
     override fun newInstance(workflow: Workflow): WorkflowInstance {
-        val key = instances.size as Long;
+        val key = ++keyGenerator
         val instance = WorkflowInstance(workflow, key)
-        instances.add(instance)
+        instances[key] = instance
         return instance
     }
 
-    override fun updateInstance(key: Long, state: FlowNode) {
-        instances.get(key as Int).currentState = state
+    override fun updateInstance(instance: WorkflowInstance) {
+        instances[instance.key] = instance
     }
 
-    override fun getInstance(key: Long): WorkflowInstance? {
-        return instances.get(key as Int)
+    override fun removeInstance(instance: WorkflowInstance) {
+        instances.remove(instance.key)
     }
+
+    override fun getInstance(key: Long): WorkflowInstance? = instances[key]
 }

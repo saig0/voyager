@@ -1,5 +1,6 @@
 import io.zeebe.voyager.WorkflowEngine
 import io.zeebe.voyager.inmemory.InMemoryConfiguration
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -38,8 +39,9 @@ class WorkflowEngineTest {
         workflowEngine.deploy(workflow)
 
         // when
-        workflowEngine.create("order-process")
+        val key = workflowEngine.create("order-process")
 
         // then
+        assertThat(key).isGreaterThan(0)
     }
 }
