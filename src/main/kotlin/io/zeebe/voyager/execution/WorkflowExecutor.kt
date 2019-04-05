@@ -14,25 +14,32 @@ class WorkflowExecutor(configuration: Configuration) {
 
     fun execute(workflow: Workflow) : Long {
         val newInstance = instanceService.newInstance(workflow)
-        val currentState = newInstance.currentState
 
-
-        val target = currentState.outcomming[0].target
-        when(target) {
-            is Task ->
-            {
-                val taskType = target.type
-                taskService.create(taskType, newInstance)
-                newInstance.currentState = target
-                instanceService.updateInstance(newInstance)
-            }
-            is EndEvent ->
-            {
-                instanceService.removeInstance(newInstance)
-            }
-        }
+        executeWorkflowInstance(newInstance)
 
         return newInstance.key
+    }
+
+    private fun executeWorkflowInstance(workflowInstance: WorkflowInstance) {
+        val currentState = workflowInstance.currentState
+        val target = currentState.outcomming[0].target
+        when (target) {
+            is Task -> {
+                val taskType = target.type
+                taskService.create(taskType, workflowInstance)
+                workflowInstance.currentState = target
+                instanceService.updateInstance(workflowInstance)
+            }
+            is EndEvent -> {
+                instanceService.removeInstance(workflowInstance)
+            }
+        }
+    }
+
+    fun continueInstance(instanceKey: Long) {
+        val workflowInstance = instanceService.getInstance(instanceKey)?:
+            throw IllegalStateException("Expected to find instance with key $instanceKey, but was not found. Can't continue workflow instance.")
+        executeWorkflowInstance(workflowInstance)
     }
 
 }

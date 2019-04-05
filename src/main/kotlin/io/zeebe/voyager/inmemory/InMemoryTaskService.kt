@@ -14,7 +14,8 @@ class InMemoryTaskService : TaskService {
 
         val task = Task(
                 key = keyGenerator++,
-                type = type
+                type = type,
+                instanceKey = instance.key
         )
 
         tasks[task.key] = task

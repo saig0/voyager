@@ -33,9 +33,9 @@ class WorkflowEngine(val configuration: Configuration) {
 		return configuration.taskService.findByType(type)
 	}
 
-	fun completeTask(key: Long) {
-
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	fun completeTask(task: Task) {
+		configuration.taskService.remove(task)
+		executor.continueInstance(task.instanceKey)
 	}
 
 

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalArgumentException
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class WorkflowEngineTest {
 
     private val workflowEngine = WorkflowEngine(configuration = InMemoryConfiguration())
@@ -44,5 +44,65 @@ class WorkflowEngineTest {
         // then
         assertThat(key).isGreaterThan(0)
         assertThat(workflowEngine.findTasksByType("collect-money")).isNotEmpty
+    }
+
+    @Test
+    fun `should find task by type`() {
+        // given
+        val workflow = WorkflowEngine::class.java.classLoader.getResourceAsStream("orderProcess.bpmn")
+        workflowEngine.deploy(workflow)
+        val key = workflowEngine.create("order-process")
+
+        // when
+        val tasksByType = workflowEngine.findTasksByType("collect-money")
+
+        // then
+        assertThat(tasksByType).isNotEmpty
+
+        val firstTask = tasksByType[0]
+        assertThat(firstTask.instanceKey).isEqualTo(key)
+        assertThat(firstTask.type).isEqualTo("collect-money")
+        assertThat(firstTask.key).isGreaterThan(0)
+    }
+
+    @Test
+    fun `should complete task`() {
+        // given
+        val workflow = WorkflowEngine::class.java.classLoader.getResourceAsStream("orderProcess.bpmn")
+        workflowEngine.deploy(workflow)
+        workflowEngine.create("order-process")
+        val tasksByType = workflowEngine.findTasksByType("collect-money")
+
+        // when
+        workflowEngine.completeTask(tasksByType[0])
+
+        // then
+        assertThat(workflowEngine.findTasksByType("collect-money")).isEmpty()
+        assertThat(workflowEngine.findTasksByType("fetch-items")).isNotEmpty
+    }
+
+    @Test
+    fun `should complete instance`() {
+        // given
+        val workflow = WorkflowEngine::class.java.classLoader.getResourceAsStream("orderProcess.bpmn")
+        workflowEngine.deploy(workflow)
+        val instanceKey = workflowEngine.create("order-process")
+
+        // when
+        val collectMoneyType = workflowEngine.findTasksByType("collect-money")
+        workflowEngine.completeTask(collectMoneyType[0])
+
+        val fetchItemsType = workflowEngine.findTasksByType("fetch-items")
+        workflowEngine.completeTask(fetchItemsType[0])
+
+        val shipParcelType = workflowEngine.findTasksByType("ship-parcel")
+        workflowEngine.completeTask(shipParcelType[0])
+
+        // then
+        assertThat(workflowEngine.findTasksByType("collect-money")).isEmpty()
+        assertThat(workflowEngine.findTasksByType("fetch-items")).isEmpty()
+        assertThat(workflowEngine.findTasksByType("ship-parcel")).isEmpty()
+
+        assertThat(workflowEngine.configuration.instanceService.getInstance(instanceKey)).isNull()
     }
 }
