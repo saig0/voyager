@@ -24,8 +24,6 @@ class WorkflowEngine(val configuration: Configuration) {
 		val workflow = configuration.workflowService.findLatest(bpmnProcessId)
 			?: throw IllegalArgumentException("no workflow found with BPMN process id '${bpmnProcessId}'")
 
-		println("Create instance of '${bpmnProcessId}' ...")
-
 		return executor.execute(workflow)
 	}
 
