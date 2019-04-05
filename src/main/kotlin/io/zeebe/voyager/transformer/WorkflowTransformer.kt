@@ -50,7 +50,7 @@ object WorkflowTransformer {
 			)
 		}
 
-		return workflows;
+		return workflows
 	}
 
 }

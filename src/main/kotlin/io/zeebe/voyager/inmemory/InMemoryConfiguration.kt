@@ -4,5 +4,6 @@ import io.zeebe.voyager.Configuration
 
 class InMemoryConfiguration : Configuration(
         workflowService = InMemoryWorkflowService(),
-        instanceService = InMemoryInstanceService()
+        instanceService = InMemoryInstanceService(),
+        taskService = InMemoryTaskService()
 )
