@@ -3,6 +3,7 @@ package io.zeebe.voyager
 import java.io.InputStream
 import io.zeebe.voyager.transformer.WorkflowTransformer
 import io.zeebe.model.bpmn.Bpmn
+import io.zeebe.voyager.execution.Task
 import io.zeebe.voyager.execution.WorkflowExecutor
 
 class WorkflowEngine(val configuration: Configuration) {
@@ -27,5 +28,15 @@ class WorkflowEngine(val configuration: Configuration) {
 
 		return executor.execute(workflow)
 	}
+
+	fun findTasksByType(type: String) : List<Task> {
+		return configuration.taskService.findByType(type)
+	}
+
+	fun completeTask(key: Long) {
+
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
 
 }
