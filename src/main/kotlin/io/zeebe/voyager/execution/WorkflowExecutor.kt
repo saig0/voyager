@@ -2,7 +2,7 @@ package io.zeebe.voyager.execution
 
 import io.zeebe.voyager.Configuration
 import io.zeebe.voyager.model.EndEvent
-import io.zeebe.voyager.model.Task
+import io.zeebe.voyager.model.Task as BpmnTask
 import io.zeebe.voyager.model.Workflow
 import io.zeebe.voyager.services.InstanceService
 import io.zeebe.voyager.services.TaskService
@@ -24,9 +24,9 @@ class WorkflowExecutor(configuration: Configuration) {
         val currentState = workflowInstance.currentState
         val target = currentState.outcomming[0].target
         when (target) {
-            is Task -> {
+            is BpmnTask -> {
                 val taskType = target.type
-                taskService.create(taskType, workflowInstance)
+                workflowInstance.taskRef = taskService.create(taskType, workflowInstance)
                 workflowInstance.currentState = target
                 instanceService.updateInstance(workflowInstance)
             }
@@ -36,10 +36,19 @@ class WorkflowExecutor(configuration: Configuration) {
         }
     }
 
-    fun continueInstance(instanceKey: Long) {
+    fun continueInstance(task: Task) {
+        val instanceKey = task.instanceKey
         val workflowInstance = instanceService.getInstance(instanceKey)?:
             throw IllegalStateException("Expected to find instance with key $instanceKey, but was not found. Can't continue workflow instance.")
-        executeWorkflowInstance(workflowInstance)
+
+        if (workflowInstance.taskRef == task)
+        {
+            executeWorkflowInstance(workflowInstance)
+        }
+        else
+        {
+            throw IllegalArgumentException("Expected to continue workflow instance on ${workflowInstance.taskRef}, but given task reference was $task")
+        }
     }
 
 }

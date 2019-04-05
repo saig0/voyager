@@ -1,6 +1,6 @@
 package io.zeebe.voyager.execution
 
-class Task (
+data class Task (
 		val key: Long,
 		val type: String,
 		val instanceKey: Long

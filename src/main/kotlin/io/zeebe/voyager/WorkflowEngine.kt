@@ -35,7 +35,7 @@ class WorkflowEngine(val configuration: Configuration) {
 
 	fun completeTask(task: Task) {
 		configuration.taskService.remove(task)
-		executor.continueInstance(task.instanceKey)
+		executor.continueInstance(task)
 	}
 
 

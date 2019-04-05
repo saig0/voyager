@@ -82,6 +82,24 @@ class WorkflowEngineTest {
     }
 
     @Test
+    fun `should not complete task twice`() {
+        // given
+        val workflow = WorkflowEngine::class.java.classLoader.getResourceAsStream("orderProcess.bpmn")
+        workflowEngine.deploy(workflow)
+        workflowEngine.create("order-process")
+        val tasksByType = workflowEngine.findTasksByType("collect-money")
+
+        // when
+        workflowEngine.completeTask(tasksByType[0])
+
+        val exception = assertThrows<IllegalArgumentException>("should throw exception")
+        {
+            workflowEngine.completeTask(tasksByType[0])
+        }
+
+        assertThat(exception).hasMessageContaining("Expected to continue workflow instance")
+    }
+    @Test
     fun `should complete instance`() {
         // given
         val workflow = WorkflowEngine::class.java.classLoader.getResourceAsStream("orderProcess.bpmn")
