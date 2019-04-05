@@ -43,5 +43,6 @@ class WorkflowEngineTest {
 
         // then
         assertThat(key).isGreaterThan(0)
+        assertThat(workflowEngine.configuration.taskService.findByType("collect-money")).isNotEmpty
     }
 }
