@@ -21,7 +21,6 @@ class CompleteFlowNode : WorkflowStep {
 
 	override fun execute(context: ExecutionContext) {
 
-		println("-> execute step COMPLETE_FLOW_NODE with $context")
 		val flowNode = context.element as FlowNode
 
 		context.configuration.auditService.event("ACTIVATED", context.instance, context.key, flowNode)
@@ -34,7 +33,6 @@ class TakeSequenceFlow : WorkflowStep {
 
 	override fun execute(context: ExecutionContext) {
 		
-		println("-> execute step TAKE_SF with $context")
 		val flowNode = context.element as FlowNode
 
 		context.configuration.auditService.event("COMPLETED", context.instance, context.key, flowNode)
@@ -62,7 +60,6 @@ class CreateTask : WorkflowStep {
 
 	override fun execute(context: ExecutionContext) {
 
-		println("-> execute step CREATE_TASK with $context")
 		val task = context.element as Task
 		val newTask = context.configuration.taskService.create(task.type, context.instance)
 
@@ -77,7 +74,6 @@ class CompleteTask : WorkflowStep {
 
 	override fun execute(context: ExecutionContext) {
 
-		println("-> execute step COMPLETE_TASK with $context")
 		context.configuration.taskService.remove(context.instance.taskRef!!)
 
 		context.instance.taskRef = null
@@ -89,7 +85,6 @@ class ConsumeToken : WorkflowStep {
 
 	override fun execute(context: ExecutionContext) {
 
-		println("-> execute step CONSUME_TOKEN with $context")
 		context.configuration.instanceService.removeInstance(context.instance)
 		context.configuration.auditService.event("COMPLETED", context.instance, context.key, context.element)
 
